@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: warzone2100\n"
 "Report-Msgid-Bugs-To: warzone2100-project@lists.sourceforge.net\n"
-"POT-Creation-Date: 2021-03-20 14:29+0000\n"
+"POT-Creation-Date: 2021-03-23 01:08+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -4165,9 +4165,9 @@ msgstr ""
 #: data/base/script/tutorial.js:511
 #: data/mp/multiplay/script/rules/reticule.js:111
 #: src/challenge.cpp:240
-#: src/hci.cpp:1834
-#: src/hci/objects_stats.cpp:213
-#: src/hci/objects_stats.cpp:298
+#: src/hci.cpp:1835
+#: src/hci/objects_stats.cpp:220
+#: src/hci/objects_stats.cpp:305
 #: src/intelmap.cpp:406
 #: src/intorder.cpp:609
 #: src/loadsave.cpp:265
@@ -15028,35 +15028,35 @@ msgstr ""
 msgid "Structure Restored"
 msgstr ""
 
-#: src/droid.cpp:1829
+#: src/droid.cpp:1830
 #, c-format
 msgid "Group %u selected - %u Unit"
 msgid_plural "Group %u selected - %u Units"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/droid.cpp:1838
+#: src/droid.cpp:1839
 #, c-format
 msgid "%u unit assigned to Group %u"
 msgid_plural "%u units assigned to Group %u"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/droid.cpp:1849
+#: src/droid.cpp:1850
 #, c-format
 msgid "Centered on Group %u - %u Unit"
 msgid_plural "Centered on Group %u - %u Units"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/droid.cpp:1853
+#: src/droid.cpp:1854
 #, c-format
 msgid "Aligning with Group %u - %u Unit"
 msgid_plural "Aligning with Group %u - %u Units"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/droid.cpp:2935
+#: src/droid.cpp:2936
 msgid "Unit transfer failed -- unit limits exceeded"
 msgstr ""
 
@@ -15206,12 +15206,12 @@ msgid "CAMPAIGNS"
 msgstr ""
 
 #: src/frontend.cpp:498
-#: src/ingameop.cpp:944
+#: src/ingameop.cpp:953
 msgid "Load Campaign Saved Game"
 msgstr ""
 
 #: src/frontend.cpp:504
-#: src/ingameop.cpp:948
+#: src/ingameop.cpp:957
 msgid "Load Skirmish Saved Game"
 msgstr ""
 
@@ -15241,12 +15241,12 @@ msgid "Game Options"
 msgstr ""
 
 #: src/frontend.cpp:636
-#: src/ingameop.cpp:486
+#: src/ingameop.cpp:495
 msgid "Graphics Options"
 msgstr ""
 
 #: src/frontend.cpp:637
-#: src/ingameop.cpp:489
+#: src/ingameop.cpp:498
 msgid "Video Options"
 msgstr ""
 
@@ -15255,17 +15255,17 @@ msgid "Audio / Zoom Options"
 msgstr ""
 
 #: src/frontend.cpp:639
-#: src/ingameop.cpp:496
+#: src/ingameop.cpp:505
 msgid "Mouse Options"
 msgstr ""
 
 #: src/frontend.cpp:640
-#: src/ingameop.cpp:501
+#: src/ingameop.cpp:510
 msgid "Key Mappings"
 msgstr ""
 
 #: src/frontend.cpp:641
-#: src/ingameop.cpp:504
+#: src/ingameop.cpp:513
 msgid "Music Manager"
 msgstr ""
 
@@ -15363,32 +15363,32 @@ msgid "Tracked"
 msgstr ""
 
 #: src/frontend.cpp:765
-#: src/ingameop.cpp:532
+#: src/ingameop.cpp:541
 msgid "Video Playback"
 msgstr ""
 
 #: src/frontend.cpp:769
-#: src/ingameop.cpp:537
+#: src/ingameop.cpp:546
 msgid "Scanlines"
 msgstr ""
 
 #: src/frontend.cpp:774
-#: src/ingameop.cpp:542
+#: src/ingameop.cpp:551
 msgid "Subtitles"
 msgstr ""
 
 #: src/frontend.cpp:779
-#: src/ingameop.cpp:547
+#: src/ingameop.cpp:556
 msgid "Shadows"
 msgstr ""
 
 #: src/frontend.cpp:783
-#: src/ingameop.cpp:552
+#: src/ingameop.cpp:561
 msgid "Radar"
 msgstr ""
 
 #: src/frontend.cpp:787
-#: src/ingameop.cpp:557
+#: src/ingameop.cpp:566
 msgid "Radar Jump"
 msgstr ""
 
@@ -15500,7 +15500,7 @@ msgid "Texture size"
 msgstr ""
 
 #: src/frontend.cpp:1418
-#: src/ingameop.cpp:664
+#: src/ingameop.cpp:673
 msgid "Vertical sync"
 msgstr ""
 
@@ -15561,32 +15561,32 @@ msgid "Camera Pitch"
 msgstr ""
 
 #: src/frontend.cpp:1709
-#: src/ingameop.cpp:740
+#: src/ingameop.cpp:749
 msgid "Reverse Rotation"
 msgstr ""
 
 #: src/frontend.cpp:1713
-#: src/ingameop.cpp:747
+#: src/ingameop.cpp:756
 msgid "Trap Cursor"
 msgstr ""
 
 #: src/frontend.cpp:1718
-#: src/ingameop.cpp:753
+#: src/ingameop.cpp:762
 msgid "Switch Mouse Buttons"
 msgstr ""
 
 #: src/frontend.cpp:1723
-#: src/ingameop.cpp:758
+#: src/ingameop.cpp:767
 msgid "Rotate Screen"
 msgstr ""
 
 #: src/frontend.cpp:1727
-#: src/ingameop.cpp:763
+#: src/ingameop.cpp:772
 msgid "Colored Cursors"
 msgstr ""
 
 #: src/frontend.cpp:1731
-#: src/ingameop.cpp:768
+#: src/ingameop.cpp:777
 msgid "Scroll Event"
 msgstr ""
 
@@ -15689,55 +15689,55 @@ msgstr ""
 msgid "GAME SAVED: "
 msgstr ""
 
-#: src/hci.cpp:1353
+#: src/hci.cpp:1354
 #, c-format
 msgid "Player %u is cheating (debug menu) him/herself a new structure: %s."
 msgstr ""
 
-#: src/hci.cpp:1362
+#: src/hci.cpp:1363
 #, c-format
 msgid "Player %u is cheating (debug menu) him/herself a new feature: %s."
 msgstr ""
 
-#: src/hci.cpp:1381
+#: src/hci.cpp:1382
 #, c-format
 msgid "Player %u is cheating (debug menu) him/herself a new droid: %s."
 msgstr ""
 
-#: src/hci.cpp:1389
+#: src/hci.cpp:1390
 #, c-format
 msgid "Player %u is cheating (debug menu) him/herself a new droid."
 msgstr ""
 
-#: src/hci.cpp:1719
+#: src/hci.cpp:1720
 #: src/multiint.cpp:1443
 #: src/multimenu.cpp:686
 msgid "Power"
 msgstr ""
 
-#: src/hci.cpp:1789
-#: src/hci/build.cpp:567
-#: src/hci/manufacture.cpp:577
+#: src/hci.cpp:1790
+#: src/hci/build.cpp:568
+#: src/hci/manufacture.cpp:578
 msgid "Hiding Obsolete Tech"
 msgstr ""
 
-#: src/hci.cpp:1791
-#: src/hci/build.cpp:569
-#: src/hci/manufacture.cpp:579
+#: src/hci.cpp:1792
+#: src/hci/build.cpp:570
+#: src/hci/manufacture.cpp:580
 msgid "Showing Obsolete Tech"
 msgstr ""
 
-#: src/hci.cpp:1914
+#: src/hci.cpp:1915
 msgid ""
 "\n"
 "Cost: %1"
 msgstr ""
 
-#: src/hci.cpp:2520
+#: src/hci.cpp:2521
 msgid "Chat: All"
 msgstr ""
 
-#: src/hci.cpp:2525
+#: src/hci.cpp:2526
 msgid "Chat: Team"
 msgstr ""
 
@@ -15745,13 +15745,13 @@ msgstr ""
 msgid "Build Progress"
 msgstr ""
 
-#: src/hci/build.cpp:590
+#: src/hci/build.cpp:591
 msgid ""
 "Showing All Tech\n"
 "Right-click to add to Favorites"
 msgstr ""
 
-#: src/hci/build.cpp:592
+#: src/hci/build.cpp:593
 msgid ""
 "Showing Only Favorite Tech\n"
 "Right-click to remove from Favorites"
@@ -15761,33 +15761,33 @@ msgstr ""
 msgid "Construction Progress"
 msgstr ""
 
-#: src/hci/manufacture.cpp:617
+#: src/hci/manufacture.cpp:618
 msgid "Factory Delivery Point"
 msgstr ""
 
-#: src/hci/manufacture.cpp:668
+#: src/hci/manufacture.cpp:669
 msgid "Loop Production"
 msgstr ""
 
-#: src/hci/objects_stats.cpp:122
+#: src/hci/objects_stats.cpp:129
 msgid "Progress Bar"
 msgstr ""
 
-#: src/hci/research.cpp:385
+#: src/hci/research.cpp:391
 msgid "Research Progress"
 msgstr ""
 
-#: src/hci/research.cpp:463
+#: src/hci/research.cpp:469
 msgid "Ally progress"
 msgstr ""
 
 #: src/ingameop.cpp:111
 #: src/ingameop.cpp:183
 #: src/ingameop.cpp:235
-#: src/ingameop.cpp:510
-#: src/ingameop.cpp:569
-#: src/ingameop.cpp:682
-#: src/ingameop.cpp:776
+#: src/ingameop.cpp:519
+#: src/ingameop.cpp:578
+#: src/ingameop.cpp:691
+#: src/ingameop.cpp:785
 #: src/keyedit.cpp:446
 #: src/musicmanager.cpp:779
 msgid "Resume Game"
@@ -15803,20 +15803,20 @@ msgid "Host Quit"
 msgstr ""
 
 #: src/ingameop.cpp:170
-#: src/ingameop.cpp:979
+#: src/ingameop.cpp:988
 msgid "Tactical UI (Target Origin Icon): Show"
 msgstr ""
 
 #: src/ingameop.cpp:175
-#: src/ingameop.cpp:983
+#: src/ingameop.cpp:992
 msgid "Tactical UI (Target Origin Icon): Hide"
 msgstr ""
 
 #: src/ingameop.cpp:180
-#: src/ingameop.cpp:507
-#: src/ingameop.cpp:566
-#: src/ingameop.cpp:678
-#: src/ingameop.cpp:772
+#: src/ingameop.cpp:516
+#: src/ingameop.cpp:575
+#: src/ingameop.cpp:687
+#: src/ingameop.cpp:781
 #: src/keyedit.cpp:444
 #: src/musicmanager.cpp:778
 msgid "Go Back"
@@ -15849,23 +15849,23 @@ msgstr ""
 msgid "-->  QUIT  <--"
 msgstr ""
 
-#: src/ingameop.cpp:493
+#: src/ingameop.cpp:502
 msgid "Audio Options"
 msgstr ""
 
-#: src/ingameop.cpp:501
+#: src/ingameop.cpp:510
 msgid "View Key Mappings"
 msgstr ""
 
-#: src/ingameop.cpp:562
+#: src/ingameop.cpp:571
 msgid "Shake"
 msgstr ""
 
-#: src/ingameop.cpp:952
+#: src/ingameop.cpp:961
 msgid "Save Campaign Game"
 msgstr ""
 
-#: src/ingameop.cpp:956
+#: src/ingameop.cpp:965
 msgid "Save Skirmish Game"
 msgstr ""
 
@@ -15877,16 +15877,16 @@ msgid ""
 "Warzone will try to load the game without it."
 msgstr ""
 
-#: src/intdisplay.cpp:162
+#: src/intdisplay.cpp:163
 msgid "Waiting for Power"
 msgstr ""
 
-#: src/intdisplay.cpp:286
+#: src/intdisplay.cpp:287
 #, c-format
 msgid "%d derrick(s) inactive"
 msgstr ""
 
-#: src/intdisplay.cpp:291
+#: src/intdisplay.cpp:292
 msgid "Need more resources!"
 msgstr ""
 
