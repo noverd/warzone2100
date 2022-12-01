@@ -24,20 +24,10 @@ import bpy
 
 
 def getNumbers(string):
-    numbers = []
-    for word in string.split():
-        if word.isdigit():
-            numbers.append(int(word))
-
-    return numbers
+    return [int(word) for word in string.split() if word.isdigit()]
 
 def convertStrListToNumList(ls):
-    val = []
-
-    for word in ls:
-        val.append(float(word))
-
-    return val
+    return [float(word) for word in ls]
 
 def newTexAnimGroup(ob, polygon, index):
     ob.pie_texture_animation_groups.add()
@@ -142,7 +132,10 @@ class Importer():
             elif 'ANIMOBJECT' in line:
                 currentlyReading = 'ANIMOBJECT'
                 ls = line.split()
-                pie_info['LEVELS'][currentLevel]['ANIMOBJECT'].append(tuple([float(ls[1]), float(ls[2])]))
+                pie_info['LEVELS'][currentLevel]['ANIMOBJECT'].append(
+                    (float(ls[1]), float(ls[2]))
+                )
+
                 continue
 
             else:
@@ -187,15 +180,11 @@ class Importer():
 
         armatureObject.show_in_front = True
 
-        currentLevel = 0
-        
         for action in bpy.data.actions:
-            if action.name == pieFile + ' Anim':
+            if action.name == f'{pieFile} Anim':
                 bpy.data.actions.remove(action)
 
-        for level in pieParse['LEVELS']:
-            currentLevel += 1
-
+        for currentLevel, level in enumerate(pieParse['LEVELS'], start=1):
             nameStr = '{name} Level{num}'.format(name=pieFile, num=currentLevel)
 
             bpy.context.view_layer.objects.active = armatureObject
@@ -204,11 +193,11 @@ class Importer():
             bone = armatureObject.data.edit_bones.new(nameStr)
             bone.head = (0, 0, 0)
             bone.tail = (0, 0.125, 0)
-            
+
             boneName = bone.name
 
             bpy.ops.object.mode_set(mode='OBJECT', toggle=False)
-            
+
             mesh = bpy.data.meshes.new(nameStr)
             meshObject = bpy.data.objects.new(nameStr , mesh)
             meshObject.parent = armatureObject
@@ -223,16 +212,11 @@ class Importer():
             #* POINTS/POLYGONS *#
 
             pie_points = level['POINTS']
-            pie_polygons = []
-            
-            for poly in level['POLYGONS']:
-                pie_polygons.append((poly[2], poly[3], poly[4]))
-
+            pie_polygons = [(poly[2], poly[3], poly[4]) for poly in level['POLYGONS']]
 
             mesh.from_pydata(pie_points, [], pie_polygons)
 
-            ii = 0
-            for poly in level['POLYGONS']:
+            for ii, poly in enumerate(level['POLYGONS']):
                 loop = ii * 3
 
                 if int(poly[0]) == 200:
@@ -253,15 +237,15 @@ class Importer():
                     else:
                         success = False
                         for texAnimGroup in meshObject.pie_texture_animation_groups:
-                    
+
                             if (int(poly[5]) == texAnimGroup.texAnimImages and int(poly[6]) == texAnimGroup.texAnimRate and int(poly[7]) == texAnimGroup.texAnimWidth and int(poly[8]) == texAnimGroup.texAnimHeight):
                                 texAnimGroup.texAnimFaces += ' {str} '.format(str=str(ii))
                                 success = True
                                 break
-                    
+
                         if success is False:
                             newTexAnimGroup(meshObject, poly, ii)
-                            
+
 
                     if pieParse['PIE'] is 3:
                         meshObject.data.uv_layers.active.data[loop + 0].uv = ((poly[9], poly[10]))
@@ -271,44 +255,8 @@ class Importer():
                         meshObject.data.uv_layers.active.data[loop + 0].uv = ((poly[9] / 256, poly[10] / 256))
                         meshObject.data.uv_layers.active.data[loop + 1].uv = ((poly[11] / 256, poly[12] / 256))
                         meshObject.data.uv_layers.active.data[loop + 2].uv = ((poly[13] / 256, poly[14] / 256))
-                    
-                ii += 1
 
-            #* NORMALS *#
-
-            #if level['NORMALS']:
-                #meshObject.pie_object_prop.exportNormals = True
-
-                #normals = []
-                #verts = []
-                #ii = 0
-                #for poly in mesh.polygons:
-                #    jj = 0
-                #    poly.use_smooth = True
-                #    print(poly.normal)
-                #    for vertex in poly.vertices:
-                #        if vertex not in verts:
-                #            verts.append(vertex)
-                #            meshObject.data.vertices[vertex].normal = (level['NORMALS'][ii][jj], level['NORMALS'][ii][jj + 1], level['NORMALS'][ii][jj + 2])
-                #            #print(*(level['NORMALS'][ii][jj], level['NORMALS'][ii][jj + 1], level['NORMALS'][ii][jj + 2]))
-                #            #print(meshObject.data.vertices[vertex].normal)
-                #            normals.append(meshObject.data.vertices[vertex].normal)
-                #        jj += 3
-                #    ii += 1
-
-                #mesh.create_normals_split()
-
-                #mesh.calc_normals_split()
-
-                #mesh.show_normal_vertex = mesh.show_normal_loop = True
-
-                #mesh.normals_split_custom_set([(0,0,0) for l in mesh.loops])
-                #mesh.normals_split_custom_set_from_vertices(normals)
-
-            #* CONNECTORS *#
-
-            ii = 1
-            for connector in level['CONNECTORS']:
+            for ii, connector in enumerate(level['CONNECTORS'], start=1):
                 connectorObject = bpy.data.objects.new('{name} Connector{num}'.format(name=nameStr, num=ii), None)
                 connectorObject.empty_display_size = 0.125
                 connectorObject.empty_display_type = 'ARROWS'
@@ -318,8 +266,6 @@ class Importer():
                 connectorObject.pieType = 'CONNECTOR'
 
                 self.scene.collection.objects.link(connectorObject)
-
-                ii += 1
 
             #* ANIMOBJECT *#
 
@@ -332,7 +278,7 @@ class Importer():
 
                 if armatureObject.animation_data is None:
                     armatureObject.animation_data_create()
-                    action = bpy.data.actions.new(pieFile + ' Anim')
+                    action = bpy.data.actions.new(f'{pieFile} Anim')
 
                 armatureObject.animation_data.action = action
 
@@ -354,7 +300,7 @@ class Importer():
                     self.scene.frame_start = level['ANIMOBJECT'][1][0]
 
                 for key in level['ANIMOBJECT']:
-                    
+
                     if len(key) < 10:
                         meshObject.pie_object_prop.animTime = key[0]
                         meshObject.pie_object_prop.animCycle = key[1]
@@ -445,7 +391,7 @@ class Importer():
             objProp.adrOff = False
             objProp.adrOn = False
             objProp.pmr = False
-        
+
         if len(flags) > 1:
             if flags[1] is 1:
                 objProp.roll = True
@@ -459,24 +405,13 @@ class Importer():
             else:
                 objProp.roll = False
                 objProp.pitch = False
-        
+
         if len(flags) > 2:
-            if flags[2] is 2:
-                objProp.reserved = True
-            else:
-                objProp.reserved = False
-        
+            objProp.reserved = flags[2] is 2
         if len(flags) > 3:
-            if flags[3] is 1:
-                objProp.stretch = True
-            else:
-                objProp.stretch = False
-        
+            objProp.stretch = flags[3] is 1
         if len(flags) > 4:
-            if flags[4] is 1:
-                objProp.tcMask = True
-            else:
-                objProp.tcMask = False
+            objProp.tcMask = flags[4] is 1
 
     def pie_import(self, scene, pieDir, pieMesh):
         self.scene = scene

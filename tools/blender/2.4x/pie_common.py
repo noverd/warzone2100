@@ -27,7 +27,7 @@ __version__ = "1.0"
 
 from Blender import *
 
-verbose = (Registry.GetKey('General') or dict()).get('verbose', True)
+verbose = (Registry.GetKey('General') or {}).get('verbose', True)
 
 class FatalError(Exception):
 	pass
@@ -47,8 +47,10 @@ def save_defaults(ui):
 	for opt in ui.getData('optlist'):
 		name = opt['name']
 		defaults[name] = scalar_value(opt['val'], opt['opts'])
-	if 'tooltips' not in defaults: defaults['tooltips'] = dict()
-	if 'limits' not in defaults: defaults['limits'] = dict()
+	if 'tooltips' not in defaults:
+		defaults['tooltips'] = {}
+	if 'limits' not in defaults:
+		defaults['limits'] = {}
 	defaults['tooltips'].update(ui.getData('tooltips'))
 	defaults['limits'].update(ui.getData('limits'))
 	Registry.SetKey('warzone_pie', defaults, True)
@@ -78,10 +80,10 @@ def create_teamcolor_meta(nbPoints, width, height, frames, delay=10):
 
 class BeltFedUI:
 	def __init__(self, debug_gui=False):
-		self._persistent_data = dict()
-		self._volatile_data = dict()
+		self._persistent_data = {}
+		self._volatile_data = {}
 		self._beltlinks = [[None, None, lambda self, val: True, None]] # used for bootstrapping
-		self._linknames = dict()
+		self._linknames = {}
 		self._index = -1
 		self._skipui = False
 		self._debug_gui = debug_gui
@@ -94,7 +96,7 @@ class BeltFedUI:
 		}
 
 		self._debug_buffer = "" # also includes notices
-		self._error_list = list()
+		self._error_list = []
 
 	def debug(self, message, type="notice", lineno=None):
 		if type not in self._debug_messages:
@@ -138,20 +140,17 @@ class BeltFedUI:
 		return False
 
 	def Run(self):
-		if self._index < 0:
-			if self._debug_gui:
-				self.append(self._error_process, self._error_draw, self._error_evt,
-					[None, None], "debug")
-			self._index = 0
-			self._evt()
-		else:
+		if self._index >= 0:
 			raise ValueError("process has already started")
+		if self._debug_gui:
+			self.append(self._error_process, self._error_draw, self._error_evt,
+				[None, None], "debug")
+		self._index = 0
+		self._evt()
 
 	def _process(self):
 		func = self._beltlinks[self._index][0]
-		if callable(func):
-			return func(self)
-		return None
+		return func(self) if callable(func) else None
 
 	def _draw(self):
 		self._beltlinks[self._index][1](self)
@@ -165,7 +164,7 @@ class BeltFedUI:
 			Draw.Exit()
 			beltlen = len(self._beltlinks)
 			while retval is True:
-				self._volatile_data = dict()
+				self._volatile_data = {}
 				self._index += 1
 				self._skipui = False
 				if self._index >= beltlen: return
@@ -175,7 +174,7 @@ class BeltFedUI:
 					if not self.jumpToNamedLink('debug'): self._index = beltlen
 					continue
 				if retval is None and self._beltlinks[self._index][1] and \
-					not self._skipui:
+						not self._skipui:
 					if self._beltlinks[self._index][3]:
 						input_handler = self._handle_mousewheel
 					else:
@@ -202,9 +201,7 @@ class BeltFedUI:
 	def getData(self, key, default=None):
 		if key in self._volatile_data:
 			return self._volatile_data[key]
-		if key in self._persistent_data:
-			return self._persistent_data[key]
-		return default
+		return self._persistent_data[key] if key in self._persistent_data else default
 
 	def __contains__(key):
 		return key in self._volatile_data or key in self._persistent_data
@@ -260,9 +257,8 @@ class BeltFedUI:
 		Draw.Redraw()
 
 	def _dump_log(self, filename):
-		f = open(filename, "w")
-		f.write(self._debug_buffer)
-		f.close()
+		with open(filename, "w") as f:
+			f.write(self._debug_buffer)
 
 def normalizeObjectName(name):
 	pos = name.rfind('.')
@@ -273,7 +269,7 @@ def validate(levels):
 	""" expects levels pre-sorted by object name, and assumes that all passed
 	    objects have names starting with LEVEL_ and are children of a PIE_ object
 	"""
-	errors = list()
+	errors = []
 	if not levels:
 		errors.append(('error', "no levels were found"))
 	i = 0
@@ -290,7 +286,7 @@ def validate(levels):
 			errors.append(('warning', "expected level %i" % i))
 			i += 1
 		if level.getType() != "Mesh":
-			errors.append(('error', "%s must be a mesh object" % name))
+			errors.append(('error', f"{name} must be a mesh object"))
 			continue
 		mesh = level.getData(mesh=True)
 		num = len(mesh.faces)

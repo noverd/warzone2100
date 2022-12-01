@@ -178,14 +178,18 @@ def data_mutator(gen):
   mode = 0
   for i in gen:
     ilen = len(i)
-    if "directive" == i[0]:
+    if i[0] == "directive":
       directive = i[3]
-      if "POINTS" == directive: mode, name = 1, "point"
-      elif "CONNECTORS" == directive: mode, name = 1, "connector"
-      elif "POLYGONS" == directive: mode = 2
-      else: mode = 0
-    elif "data" != i[0] or 0 == mode: pass
-    elif 1 == mode: # points
+      if directive == "CONNECTORS":
+        mode, name = 1, "connector"
+      elif directive == "POINTS":
+        if "POINTS" == directive: mode, name = 1, "point"
+      elif directive == "POLYGONS":
+        mode = 2
+      else:
+        mode = 0
+    elif i[0] != "data" or mode == 0: pass
+    elif mode == 1: # points
       if ilen == 6:
         i[0] = name
         try:
@@ -195,8 +199,8 @@ def data_mutator(gen):
           i[3:] = [PIESyntaxError("expected a floating-point number"), name]
       else:
         i[0] = "error"
-        i[3:] = [PIESyntaxError("not a valid " + name), name]
-    elif 2 == mode: # polygons
+        i[3:] = [PIESyntaxError(f"not a valid {name}"), name]
+    elif mode == 2: # polygons
       valid = False
       if ilen > 7:
         try:
@@ -223,11 +227,10 @@ def data_mutator(gen):
 def bsp_mutator(gen):
   mode = 0
   for i in gen:
-    if "directive" == i[0]:
-      if "BSP" == i[3]: mode = 1
-      else: mode = 0
-    elif "data" != i[0]: pass
-    elif 1 == mode:
+    if i[0] == "directive":
+      mode = 1 if i[3] == "BSP" else 0
+    elif i[0] != "data": pass
+    elif mode == 1:
       try:
         i[3:] = map(int, i[3:])
         i[0] = "bsp-data"

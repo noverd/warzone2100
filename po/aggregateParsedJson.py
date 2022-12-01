@@ -1,16 +1,15 @@
 import fileinput
 import re
 
-lines_seen = dict() # holds lines already seen (minus trailing comments), mapped to a list of source references
-output_lines = list()
+lines_seen = {}
+output_lines = []
 
 # See: https://stackoverflow.com/a/241506
 def comment_remover(text):
 	def replacer(match):
 		s = match.group(0)
-		if s.startswith('/'):
-			return " " # note: a space and not an empty string
-		return s
+		return " " if s.startswith('/') else s
+
 	pattern = re.compile(
 		r'//.*?$|/\*.*?\*/|\'(?:\\.|[^\\\'])*\'|"(?:\\.|[^\\"])*"',
 		re.DOTALL | re.MULTILINE
@@ -22,7 +21,7 @@ def src_ref_comment_extractor(text, remove_prefix="// SRC:"):
 		r'//.*?$|/\*.*?\*/|\'(?:\\.|[^\\\'])*\'|"(?:\\.|[^\\"])*"',
 		re.DOTALL | re.MULTILINE
 	)
-	comments = list()
+	comments = []
 	for m in re.finditer(pattern, text):
 		if m.group(0).startswith("//"):
 			# found a comment
@@ -51,9 +50,9 @@ for line in sorted(output_lines, key=str.casefold):
 	for idx, src_ref in zip(range(src_ref_limit), sorted_src_refs):
 		if idx == 0:
 			print("// TRANSLATORS: ")
-		print("// " + src_ref)
+		print(f"// {src_ref}")
 	if len(sorted_src_refs) > src_ref_limit:
-		print("// ... + " + str(len(sorted_src_refs) - src_ref_limit) + " refs")
+		print(f"// ... + {str(len(sorted_src_refs) - src_ref_limit)} refs")
 	if "%" in line:
 		# ensure xgettext doesn't decide to treat this as a c-format line
 		print("// xgettext:no-c-format")

@@ -18,6 +18,7 @@ def is_number(s):
 		return False
 
 data = {}
+accum = []
 for section in config.sections():
 	entry = {}
 	for opt in config.items(section):
@@ -25,11 +26,7 @@ for section in config.sections():
 		value = opt[1]
 		if value.startswith('"') and value.endswith('"'):
 			value = value[1:-1]
-		accum = []
-		if is_number(value):
-			entry[key] = int(value)
-		else:
-			entry[key] = value
-	assert not section in data, '%s conflicts' % section
+		entry[key] = int(value) if is_number(value) else value
+	assert section not in data, f'{section} conflicts'
 	data[section] = entry
-print json.dumps(data, indent=4, separators=(',', ': '), sort_keys=True)
+data = {}

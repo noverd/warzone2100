@@ -52,19 +52,21 @@ def convertFiles(old_dir, new_dir, video_dir = "", fps = 25):
     if use_video_fps:
         from theora import Theora
     if use_video_fps:
-        print "Using fps values from the actual video files"
-    else:
-        print "Using the default fps: " + str(fps)
     for dirpath, dirnames, filenames in os.walk (old_dir):
         os.mkdir (os.path.join (new_dir, dirpath[1+len (old_dir):]))
         for filename in filenames:
             old_file = (os.path.join(dirpath, filename))
             new_file = (os.path.join(new_dir, dirpath[1+len (old_dir):], filename))
             if use_video_fps:
-                video_file = os.path.join(video_dir, dirpath[1+len (old_dir):], os.path.splitext(filename)[0] + ".ogg")
+                video_file = os.path.join(
+                    video_dir,
+                    dirpath[1 + len(old_dir) :],
+                    f"{os.path.splitext(filename)[0]}.ogg",
+                )
+
                 video = Theora(video_file)
                 fps = int(video.fps_ratio[0] / video.fps_ratio[1])
-            print old_file + "->" + new_file
+            old_file = (os.path.join(dirpath, filename))
             convertFile(old_file, new_file, fps)
 
 if __name__ == "__main__":
@@ -79,8 +81,5 @@ if __name__ == "__main__":
     parser.add_argument('-fps', '--f', metavar='fps', type=int, dest="fps",
                    help='FPS to use. Defaults to 25')
     got_args = parser.parse_args().__dict__
-    args = {}
-    for arg in got_args:
-        if got_args[arg]:
-            args[arg] = got_args[arg]
+    args = {arg: got_args[arg] for arg in got_args if got_args[arg]}
     convertFiles(**args)

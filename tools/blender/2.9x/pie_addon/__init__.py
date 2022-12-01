@@ -105,7 +105,10 @@ class PIE_TextureAnimationGroupOperationAdd(bpy.types.Operator):
         ob = context.object
 
         texAnimGroup = ob.pie_texture_animation_groups.add()
-        texAnimGroup.name = 'Texture Animation Group ' + str(len(ob.pie_texture_animation_groups))
+        texAnimGroup.name = (
+            f'Texture Animation Group {len(ob.pie_texture_animation_groups)}'
+        )
+
         texAnimGroup.texAnimImages = 0
         texAnimGroup.texAnimRate = 1
         texAnimGroup.texAnimWidth = 256
@@ -147,19 +150,12 @@ class PIE_TextureAnimationGroupOperationSelect(bpy.types.Operator):
         bm = bmesh.from_edit_mesh(ob.data)
         faces = bm.faces
         faceSetStr = ob.pie_texture_animation_groups[ob.pie_texture_animation_group_index].texAnimFaces
-        faceSetInt = []
-
         for face in faces:
             face.select = False
 
-        for face in faceSetStr.split():
-            faceSetInt.append(int(face))
-
-        ii = 0
-        while ii < len(faceSetInt):
-            bm.faces[int(faceSetInt[ii])].select = True
-            ii += 1
-
+        faceSetInt = [int(face) for face in faceSetStr.split()]
+        for item in faceSetInt:
+            bm.faces[int(item)].select = True
         bmesh.update_edit_mesh(ob.data)
 
         return {'FINISHED'}
@@ -177,8 +173,7 @@ class PIE_TextureAnimationGroupOperationSet(bpy.types.Operator):
         faces = bm.faces
         faceSet = ''
 
-        ii = 0
-        while ii < len(faces):
+        for ii in range(len(faces)):
             if faces[ii].select is True:
                 faceSet += ' {str} '.format(str=str(ii))
 
@@ -188,8 +183,6 @@ class PIE_TextureAnimationGroupOperationSet(bpy.types.Operator):
                         newFaceSet = ob.pie_texture_animation_groups[jj].texAnimFaces.replace(' {str} '.format(str=str(ii)), '')
                         ob.pie_texture_animation_groups[jj].texAnimFaces = newFaceSet
                     jj += 1
-
-            ii += 1
 
         ob.pie_texture_animation_groups[ob.pie_texture_animation_group_index].texAnimFaces = faceSet
 
@@ -296,7 +289,7 @@ class PIE_ExportOperationQuick(bpy.types.Operator):
 
     def invoke(self, context, event):
         scene = context.scene
-        
+
         if scene.pie_export_prop.rootDir[len(scene.pie_export_prop.rootDir) - 1] is not '\\':
             scene.pie_export_prop.rootDir += '\\' 
 
@@ -305,10 +298,9 @@ class PIE_ExportOperationQuick(bpy.types.Operator):
         for ob in bpy.context.selected_objects:
             while ob.parent is not None and ob.pie_object_prop.pieType != "ROOT":
                 ob = ob.parent
-            if ob.pie_object_prop.pieType == "ROOT":
-                if ob not in obs:
-                    obs.append(ob)
-                    ob.select_set(False)
+            if ob.pie_object_prop.pieType == "ROOT" and ob not in obs:
+                obs.append(ob)
+                ob.select_set(False)
 
         if len(obs) is 0:
             self.report({'ERROR'}, 'You must select at least 1 "Root" PIE object or an object which is parented to one before exporting')
@@ -342,10 +334,9 @@ class PIE_ExportOperation(bpy.types.Operator):
         for ob in bpy.context.selected_objects:
             while ob.parent is not None and ob.pie_object_prop.pieType != "ROOT":
                 ob = ob.parent
-            if ob.pie_object_prop.pieType == "ROOT":
-                if ob not in obs:
-                    obs.append(ob)
-                    ob.select_set(False)
+            if ob.pie_object_prop.pieType == "ROOT" and ob not in obs:
+                obs.append(ob)
+                ob.select_set(False)
 
         if len(obs) is 0:
             self.report({'ERROR'}, 'You must select at least 1 "Root" PIE object or an object which is parented to one before exporting')

@@ -11,15 +11,10 @@ from os import makedirs
 from os.path import exists as pathexists, dirname
 
 def getPOFiles():
-    pofiles = {}
-
     files = glob.glob('*.po')
     files.sort()
 
-    for f in files:
-        pofiles[f.split(".")[0]] = polib.pofile(f)
-
-    return pofiles
+    return {f.split(".")[0]: polib.pofile(f) for f in files}
 
 
 def pullMac(pFile):
@@ -29,13 +24,14 @@ def pullMac(pFile):
         content = fp.read()
 
         for (string, quoted) in pFile["strings"]:
-            if not quoted:
-                m = re.search('%s\s+=\s+"(.*)"\s?;' % string, content)
-            else:
-                m = re.search('"%s"\s+=\s+"(.*)"\s?;' % string, content)
+            m = (
+                re.search('"%s"\s+=\s+"(.*)"\s?;' % string, content)
+                if quoted
+                else re.search('%s\s+=\s+"(.*)"\s?;' % string, content)
+            )
 
             if m:
-                result[string] = m.group(1)
+                result[string] = m[1]
 
     return result
 
@@ -52,9 +48,11 @@ def pushMac(pFile, pofiles):
             for (string, quoted) in pFile["strings"]:
                 poEntry = po.find(english[string])
 
-                if (poEntry and
-                  not "fuzzy" in poEntry.flags and
-                  poEntry.msgstr != ""):
+                if (
+                    poEntry
+                    and "fuzzy" not in poEntry.flags
+                    and poEntry.msgstr != ""
+                ):
                     translated = poEntry.msgstr
                 else:
                     translated = english[string]
@@ -72,7 +70,7 @@ def pullINI(pFile):
         ini = INIConfig(fp)
 
         for (section, entry) in pFile["strings"]:
-            result["%s_%s" % (section, entry)] = ini[section][entry]
+            result[f"{section}_{entry}"] = ini[section][entry]
 
     return result
 
@@ -87,10 +85,12 @@ def pushINI(pFile, pofiles):
             for lang, po in pofiles.iteritems():
                 poEntry = po.find(value)
 
-                if (poEntry and
-                  not "fuzzy" in poEntry.flags and
-                  poEntry.msgstr != ""):
-                    ini[section]["%s[%s]" % (entry, lang)] = poEntry.msgstr
+                if (
+                    poEntry
+                    and "fuzzy" not in poEntry.flags
+                    and poEntry.msgstr != ""
+                ):
+                    ini[section][f"{entry}[{lang}]"] = poEntry.msgstr
 
         with codecs.open(pFile["file"], "w+b", "utf-8") as wFp:
             wFp.write(unicode(ini))

@@ -7,19 +7,19 @@ def printString(s, begin, end, filename, jsonPath):
 def parse(obj, filename, jsonPath="$"):
 	if isinstance(obj, dict):
 		for k, v in obj.items():
-			parse(v, filename, jsonPath + "." + k)
+			parse(v, filename, f"{jsonPath}.{k}")
 			if k in ['name', 'tip', 'easy_tip', 'medium_tip', 'hard_tip', 'insane_tip'] and isinstance(v, str):
-				printString(v, '_(', '\n', filename, jsonPath + "." + k)
+				printString(v, '_(', '\n', filename, f"{jsonPath}.{k}")
 			elif k in ['text', 'ranks'] and isinstance(v, list):
 				for idx, s in enumerate(v):
-					itemPath = jsonPath + "." + k + "[" + str(idx) + "]"
 					if isinstance(s, str):
+						itemPath = f"{jsonPath}.{k}[{str(idx)}]"
 						if k == 'text':
 							printString(s, '_(', '\n', filename, itemPath)
 						elif k == 'ranks':
 							printString(s, 'NP_("rank", ', '\n', filename, itemPath)
 	elif isinstance(obj, list):
 		for idx, v in enumerate(obj):
-			parse(v, filename, jsonPath + "[" + str(idx) + "]")
+			parse(v, filename, f"{jsonPath}[{str(idx)}]")
 
 parse(json.load(open(sys.argv[1], 'r')), sys.argv[1])

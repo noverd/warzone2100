@@ -7,6 +7,7 @@ Group: 'Object'
 Tooltip: 'Give each selected PIE LEVEL object its own visible layer'
 """
 
+
 __author__ = "Kevin Gillette"
 __url__ = ["blender"]
 __version__ = "0.2"
@@ -54,14 +55,13 @@ criteria will be assigned layers.
 
 import Blender
 selobjects = Blender.Object.GetSelected()
-pie_layers = dict()
-pie_connectors = dict()
+pie_layers = {}
+pie_connectors = {}
 script_key = "pie_levels_to_layers"
 
 def find_pie(obj):
 	if obj is None: return None
-	if obj.getName().startswith("PIE_"): return obj
-	return find_pie(obj.getParent())
+	return obj if obj.getName().startswith("PIE_") else find_pie(obj.getParent())
 
 #for ob in Blender.Scene.GetCurrent().objects:
 for ob in selobjects:
@@ -80,7 +80,7 @@ for ob in selobjects:
 		ob.layers = layers
 	elif name.startswith("CONNECTOR_"):
 		name = find_pie(ob).getName()
-		pie_connectors.setdefault(name, list()).append(ob)
+		pie_connectors.setdefault(name, []).append(ob)
 		continue
 	else:
 		continue

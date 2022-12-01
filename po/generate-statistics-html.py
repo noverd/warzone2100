@@ -39,17 +39,17 @@ for i in glob.glob('*.po'):
 	matches = re.search('(\d+) translated', output)
 
 	if matches != None:
-		messages['translated'] = int(matches.group(1))
+		messages['translated'] = int(matches[1])
 
 	matches = re.search('(\d+) untranslated', output)
 
 	if matches != None:
-		messages['untranslated'] = int(matches.group(1))
+		messages['untranslated'] = int(matches[1])
 
 	matches = re.search('(\d+) fuzzy', output)
 
 	if matches != None:
-		messages['fuzzy'] = int(matches.group(1))
+		messages['fuzzy'] = int(matches[1])
 
 	messages['amount'] = (messages['translated'] + messages['untranslated'] + messages['fuzzy'])
 
@@ -59,7 +59,24 @@ for i in glob.glob('*.po'):
 
 	catalog = '%6d%s' % (((1 - percents['translated']) * 10000), i)
 
-	catalogs[catalog] = '<li class="' + ('translation_complete' if percents['translated'] >= 0.9 else ('translation_unfinished' if percents['translated'] >= 0.8 else 'translation_incomplete')) + '">\n<span class="messages_translated" style="width: ' + str(width) + 'px" title="' + output.rstrip()[0:-1] + '">\n'
+	catalogs[catalog] = (
+		'<li class="'
+		+ (
+			'translation_complete'
+			if percents['translated'] >= 0.9
+			else (
+				'translation_unfinished'
+				if percents['translated'] >= 0.8
+				else 'translation_incomplete'
+			)
+		)
+		+ '">\n<span class="messages_translated" style="width: '
+		+ str(width)
+		+ 'px" title="'
+		+ output.rstrip()[:-1]
+		+ '">\n'
+	)
+
 
 	if percents['untranslated'] > 0:
 		catalogs[catalog] += '<span class="messages_untranslated" style="width: %dpx"></span>\n' % max(2, (percents['untranslated'] * width))
@@ -67,14 +84,16 @@ for i in glob.glob('*.po'):
 	if percents['fuzzy'] > 0:
 		catalogs[catalog] += '<span class="messages_fuzzy" style="width: %dpx"></span>\n' % max(2, (percents['fuzzy'] * width))
 
-	catalogs[catalog] += '</span>\n<img src="%s%s.png" alt="" title="%s" /> <strong>%s</strong> %.2f%%\n</li>' % (images, i[0:-3], i[0:-3], i[0:-3], (percents['translated'] * 100))
+	catalogs[catalog] += (
+		'</span>\n<img src="%s%s.png" alt="" title="%s" /> <strong>%s</strong> %.2f%%\n</li>'
+		% (images, i[:-3], i[:-3], i[:-3], percents['translated'] * 100)
+	)
+
 
 keys = catalogs.keys()
 keys.sort()
 
-print '<ul id="translation_status">'
-
-for i in keys:
-	print catalogs[i]
-
-print '</ul>'
+import glob
+for _ in keys:
+	for i in keys:
+import glob

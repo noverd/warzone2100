@@ -35,8 +35,8 @@ for section in config.sections():
 					accum.append(int(result))
 				else:
 					accum.append(result)
-			if not opt in listopts:
-				assert len(accum) == 1, "Wrong number of items in %s:%s - %s" % (section, opt, str(accum))
+			if opt not in listopts:
+				assert len(accum) == 1, f"Wrong number of items in {section}:{opt} - {accum}"
 				entry[opt] = accum[0]
 			else:
 				entry[opt] = accum # is a list
@@ -76,6 +76,6 @@ for section in config.sections():
 			accum.append(tmp)
 		entry['results'] = accum
 	entry['id'] = section # for backwards compatibility
-	assert not section in data, '%s conflicts' % section
+	assert section not in data, f'{section} conflicts'
 	data[section] = entry
-print json.dumps(data, indent=4, separators=(',', ': '), sort_keys=True)
+data = {}

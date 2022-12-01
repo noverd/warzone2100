@@ -67,10 +67,11 @@ def seek_to_directive(err_on_nonmatch, fatal_if_not_found, *directives):
 		elif type == "error":
 			ui.debug(i[pie.ERROR].args[0], "error", i[pie.LINENO])
 		elif err_on_nonmatch:
-			ui.debug("expected %s directive." % directives[0], "warning", i[pie.LINENO])
+			ui.debug(f"expected {directives[0]} directive.", "warning", i[pie.LINENO])
 	if fatal_if_not_found:
-		ui.debug(directives[0] + " directive not found. cannot continue.",
-			"fatal-error")
+		ui.debug(
+			f"{directives[0]} directive not found. cannot continue.", "fatal-error"
+		)
 
 def generate_opt_gui(rect, optlist, tooltips, limits):
 	""" expects rect to be [xmin, ymin, xmax, ymax] """
@@ -121,7 +122,7 @@ def opt_process(ui):
 	ui.setData('defaults/script', {'auto-layer': True, 'import-scale': 1.0,
 		'scripts/layers': "pie_levels_to_layers.py",
 		'scripts/validate': "pie_validate.py"})
-	ui.setData('defaults/user', Registry.GetKey('warzone_pie', True) or dict())
+	ui.setData('defaults/user', Registry.GetKey('warzone_pie', True) or {})
 	ui.setData('limits', {'import-scale': (0.1, 1000.0)})
 	ui.setData('tooltips', {'auto-layer': "Selecting this would be the same as selecting all the newly created objects and running Object -> Scripts -> \"PIE levels -> layers\"",
 		'import-scale': "Values under 1.0 may be useful when importing from a model edited at abnormally large size in pie slicer. Values over 1.0 probably won't be useful.",
@@ -144,7 +145,7 @@ def opt_process(ui):
 	else:
 		ui.setData('pie-type', i[pie.DIRECTIVE_VALUE], True)
 		ui.debug("type %i pie detected" % ui.getData('pie-type'))
-	optlist = list()
+	optlist = []
 	dirs = Get('uscriptsdir'), Get('scriptsdir')
 	script = default_value(ui, 'scripts/layers')
 	for d in dirs:
@@ -209,12 +210,11 @@ def opt_evt(ui, val):
 		elif val is 3:
 			save_defaults(ui)
 		return
-			
+
 	if val < numopts:
 		opt = opts[val]
-		if not isinstance(opt, basestring):
-			if len(opt['opts']) is 2:
-				opt['val'] = abs(opt['val'] - 1) # toggle it between 0 and 1
+		if not isinstance(opt, basestring) and len(opt['opts']) is 2:
+			opt['val'] = abs(opt['val'] - 1) # toggle it between 0 and 1
 	elif val < numopts * 2:
 		opt = ui.getData('optlist')[val - numopts]
 		name = opt['name']
@@ -268,8 +268,8 @@ def new_texpage(filename):
 def texpage_process(ui):
 	global gen
 	ui.setData('texpage-menu', Draw.Create(0))
-	ui.setData('texpage-opts', list())
-	ui.setData('texpage-cache', dict())
+	ui.setData('texpage-opts', [])
+	ui.setData('texpage-cache', {})
 	i = seek_to_directive(False, False, "NOTEXTURE", "TEXTURE")
 	if i is None: # else assume NOTEXTURE and run it again after everything else
 		ui.debug("not a valid PIE. Either a TEXTURE or NOTEXTURE directive is required", "warning")
@@ -281,12 +281,12 @@ def texpage_process(ui):
 		texfilename = i[pie.TEXTURE_FILENAME]
 		ui.setData('texpage-width', i[pie.TEXTURE_WIDTH], True)
 		ui.setData('texpage-height', i[pie.TEXTURE_HEIGHT], True)
-	
+
 	basename, ext = os.path.splitext(texfilename.lower())
 	namelen = len(basename) + len(ext)
 	texpage_opts = ui.getData('texpage-opts')
-	ui.debug('basename: ' + basename)
-	ui.debug('ext: ' + ext)
+	ui.debug(f'basename: {basename}')
+	ui.debug(f'ext: {ext}')
 	for d in (('..', 'texpages'), ('..', '..', 'texpages'), ('..', '..', '..', 'texpages')):
 		d = os.path.join(ui.getData('dir'), *d)
 		if not os.path.exists(d): continue
@@ -307,8 +307,10 @@ def texpage_draw(ui):
 	Draw.PushButton("Proceed", 0, 15, 55, 140, 30, "Confirm texpage selection and continue")
 	options = ui.getData('texpage-opts')
 	numopts = len(options)
-	menustr = "Texpages %t"
-	menustr += ''.join("|%s %%x%i" % (options[i], i) for i in xrange(numopts))
+	menustr = "Texpages %t" + ''.join(
+		"|%s %%x%i" % (options[i], i) for i in xrange(numopts)
+	)
+
 	menustr += "|NOTEXTURE %%x%i" % numopts
 	ui.setData('texpage-menu', Draw.Menu(menustr, 3, 15, 15, 406, 30,
 		ui.getData('texpage-menu').val, "Select a texpage to bind to the model"))
@@ -335,7 +337,7 @@ def texpage_draw(ui):
 	thumbnailize(selected, 165, 55, 256)
 
 def texpage_evt(ui, val):
-	if 0 == val:
+	if val == 0:
 		options = ui.getData('texpage-opts')
 		texpage_cache = ui.getData('texpage-cache')
 		menu  = ui.getData('texpage-menu')
@@ -357,20 +359,20 @@ def texpage_evt(ui, val):
 		ui.setData('material', currentMat, True)
 		ui.setData('image', image, True)
 		return True
-	if 1 == val:
+	if val == 1:
 		return False
-	elif 2 == val:
+	elif val == 2:
 		Window.ImageSelector(new_texpage, "Select a texpage",
 			ui.getData('texpage-dir', ui.getData('dir')))
 		Draw.Redraw()
-	elif 3 == val:
+	elif val == 3:
 		Draw.Redraw()
 
 def model_process(ui):
 	i = seek_to_directive(True, True, "LEVELS")
 	numlevels = i[pie.DIRECTIVE_VALUE]
 	level, nbActualPoints, default_coords, mesh = 0, 0, None, None
-	scale = ui.getData('import-scale') 
+	scale = ui.getData('import-scale')
 	if scale is not 1.0:
 		ui.debug("scaling by a factor of %.1f" % scale)
 	point_divisor = 128.0 / scale
@@ -431,7 +433,7 @@ def model_process(ui):
 			num, numtotal = 0, i[pie.DIRECTIVE_VALUE]
 			while num < numtotal:
 				i = gen.next()
-				force_valid_points = list()
+				force_valid_points = []
 				if i[pie.TOKEN_TYPE] == "error":
 					error = i[pie.ERROR]
 					if isinstance(error, pie.PIESyntaxError) and \
@@ -476,24 +478,24 @@ def model_process(ui):
 					width = i[pos + 2]
 					height = i[pos + 3]
 					pos += 4
-					ui.debug('max ' + str(nbFrames))
-					ui.debug('time ' + str(framedelay))
-					ui.debug('width ' + str(width))
-					ui.debug('height ' + str(height))
+					ui.debug(f'max {str(nbFrames)}')
+					ui.debug(f'time {str(framedelay)}')
+					ui.debug(f'width {str(width)}')
+					ui.debug(f'height {str(height)}')
 					if nbFrames < 1:
 						ui.debug("maximum number of teamcolors/animation frames must be at least 1", "error")
 					if nbFrames is 1:
 						ui.debug("maximum number of teamcolors/animation frames should be greater than 1", "warning")
 					width /= divisorX
 					height /= divisorY
-					f.uv = create_teamcolor_meta(nbPoints, width, height, nbFrames, framedelay) 
+					f.uv = create_teamcolor_meta(nbPoints, width, height, nbFrames, framedelay)
 				mesh.activeUVLayer = 'base'
 				f.image = ui.getData('image')
 				if ui.getData('pie-version') >= 5:
 					uv = [Mathutils.Vector(i[pos], i[pos + 1]) for pos in range(pos, pos + 2 * nbPoints, 2)]
 				else:
 					uv = [Mathutils.Vector(i[pos] / divisorX, 1 - i[pos + 1] / divisorY) for pos in range(pos, pos + 2 * nbPoints, 2)]
-				ui.debug("UVs: " + repr(uv))
+				ui.debug(f"UVs: {repr(uv)}")
 				f.uv = uv
 				if flags & 0x2000:
 					# double sided

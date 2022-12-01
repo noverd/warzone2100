@@ -109,10 +109,10 @@ class Tech(object):
         return self._cumcost
 
     def matches(self, names):
-        for name in names:
-            if name.lower() in self.label.lower() or name.lower() in self.name.lower():
-                return True
-        return False
+        return any(
+            name.lower() in self.label.lower() or name.lower() in self.name.lower()
+            for name in names
+        )
 
 
 def invalid_stat_string(stat_name):
@@ -183,7 +183,7 @@ def make_the_graph():
     graph.add_subgraph(automatic)
 
     #get the technologies with dependencies
-    chosen_techs = set(tech for tech in techs.values() if tech.prereqs)
+    chosen_techs = {tech for tech in techs.values() if tech.prereqs}
     #sort by cumulative cost of the technology
     chosen_techs = sorted(find_deps(chosen_techs), key=lambda tech: (tech.cumcost, tech.label))
 
