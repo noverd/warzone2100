@@ -36,10 +36,10 @@ for section in config.sections():
 		if key in listopts:
 			entry[key] = accum
 		else:
-			assert len(accum) == 1, "Wrong number of items in %s:%s - %s" % (section, opt, str(accum))
+			assert len(accum) == 1, f"Wrong number of items in {section}:{opt} - {accum}"
 			entry[key] = accum[0]
-		if opt[0] == 'name':
+		if key == 'name':
 			entry['id'] = opt[1] # for backwards compatibility, keep untranslated version around
-	assert not section in data, '%s conflicts' % section
+	assert section not in data, f'{section} conflicts'
 	data[section] = entry
-print json.dumps(data, indent=4, separators=(',', ': '), sort_keys=True)
+data = {}

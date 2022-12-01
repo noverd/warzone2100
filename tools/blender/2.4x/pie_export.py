@@ -63,17 +63,20 @@ def fs_callback(ui, filepath, levels, connectors):
 	if texture:
 		texturename = os.path.basename(texture.getFilename())
 		if texturename.count('.') is not 1:
-			ui.debug("texture names in warzone can only have one period. " + filepath, 'error')
+			ui.debug(
+				f"texture names in warzone can only have one period. {filepath}",
+				'error',
+			)
+
 	else:
 		texturename = 'NOTEXTURE'
 		out.write("NO")
-	ui.debug('texture: ' + texturename)
+	ui.debug(f'texture: {texturename}')
 	if pie_version is 2:
 		out.write("TEXTURE 0 %s 256 256\n" % texturename)
 		texture_mult = 256.0
 	else:
-		if texture: x, y = texture.getSize()
-		else: x, y = 256, 256
+		x, y = texture.getSize() if texture else (256, 256)
 		out.write("TEXTURE 0 %s %i %i\n" % (texturename, x, y))
 		texture_mult = 1.0
 	out.write("LEVELS %i\n" % len(levels))
@@ -86,15 +89,17 @@ def fs_callback(ui, filepath, levels, connectors):
 			out.write(point_format % (-vert.co.x * 128, vert.co.z * 128, -vert.co.y * 128))
 		out.write("POLYGONS %i\n" % len(mesh.faces))
 		for j, face in enumerate(mesh.faces):
-			line_buffer = str(len(face.verts))
-			line_buffer += ''.join([" " + str(vert.index) for vert in face.verts])
+			line_buffer = str(len(face.verts)) + ''.join(
+				[f" {str(vert.index)}" for vert in face.verts]
+			)
+
 			flags = 0
 			mesh.activeUVLayer = "teamcolor_meta"
 			meta = get_teamcolor_meta(face.uv)
 			mesh.activeUVLayer = "base"
 			if meta:
-				ui.debug("teamcolor meta: " + repr(meta))
-				line_buffer += (" %i %i" + uv_format) % tuple(meta)
+				ui.debug(f"teamcolor meta: {repr(meta)}")
+				line_buffer += f" %i %i{uv_format}" % tuple(meta)
 				flags |= 0x4000
 			if face.mode & Blender.Mesh.FaceModes['TWOSIDE']:
 				flags |= 0x2000
@@ -112,9 +117,7 @@ def fs_callback(ui, filepath, levels, connectors):
 				line_buffer += uv_format % (u, v)
 			out.write("\t%s %s\n" % (hex(flags).split('x')[-1], line_buffer))
 		mesh.flipNormals()
-	# export the connectors
-	numconnectors = len(connectors)
-	if numconnectors:
+	if numconnectors := len(connectors):
 		out.write('CONNECTORS %i\n' % numconnectors)
 		for c in connectors:
 			x, y, z = c.getLocation()
@@ -122,37 +125,42 @@ def fs_callback(ui, filepath, levels, connectors):
 	out.close()
 
 def pie_sel_process(ui):
-	pie_names, pie_parts, levels, connectors = list(), list(), list(), list()
+	pie_names, pie_parts, levels, connectors = [], [], [], []
 	for ob in Object.Get():
 		name = ob.getName()
 		if name.startswith("PIE_"):
 			pie_names.append(name)
-			pie_parts.append([list(), list()])
+			pie_parts.append([[], []])
 		elif name.startswith("LEVEL_"):
 			levels.append(ob)
 		elif name.startswith("CONNECTOR_"):
 			connectors.append(ob)
-	if len(pie_names) == 0:
+	if not pie_names:
 		Draw.PupMenu("Error %t|No valid PIE objects found")
 #		return False
 	for i, lst in enumerate((levels, connectors)):
 		for ob in lst:
-			parent = ob.getParent()
-			if parent:
+			if parent := ob.getParent():
 				name = parent.getName()
 				if name in pie_names:
 					index = pie_names.index(name)
 					pie_parts[index][i].append(ob)
 	sort_key = lambda ob: ob.getName()
-	pie_errors = list()
-	for i, children in enumerate(pie_parts):
+	pie_errors = []
+	for children in pie_parts:
 		children[0].sort(key=sort_key)
 		children[1].sort(key=sort_key)
 		pie_errors.append(validate(children[0]))
 	rows = min(11, len(pie_names))
 	ui.setData('pie_selection', [Draw.Create(not i) for i in pie_errors])
-	ui.setData('pie_filenames', [Draw.Create( \
-		normalizeObjectName(name[4:].lower()) + '.pie') for name in pie_names])
+	ui.setData(
+		'pie_filenames',
+		[
+			Draw.Create(f'{normalizeObjectName(name[4:].lower())}.pie')
+			for name in pie_names
+		],
+	)
+
 	ui.setData('rows', rows)
 	ui.setData("pie_errors", pie_errors)
 	ui.setData("pie_names", pie_names)
@@ -182,8 +190,16 @@ def pie_sel_draw(ui):
 	ymargin = 5
 	for i in xrange(scroll, scroll + rows):
 		if pie_errors[i]:
-			Draw.PushButton('!! ' + pie_names[i], i, 15, ypos, 160, row_height,
-				"cannot be exported with errors. click to view errors")
+			Draw.PushButton(
+				f'!! {pie_names[i]}',
+				i,
+				15,
+				ypos,
+				160,
+				row_height,
+				"cannot be exported with errors. click to view errors",
+			)
+
 		else:
 			pie_selection[i] = Draw.Toggle(pie_names[i], i, 15, ypos, 160, row_height,
 				pie_selection[i].val, "select/deselect this object for export")
@@ -206,33 +222,40 @@ def pie_sel_evt(ui, val):
 		val -= num_pies
 		if val == 0:
 			dir = ui.getData('export-dir').val
-			if not dir: dir = './'
-			else:
+			if dir:
 				if not os.path.isdir(dir):
-					Draw.PupMenu('Error %t|' + dir + ' is not a valid directory')
+					Draw.PupMenu(f'Error %t|{dir} is not a valid directory')
 					return
+			else: dir = './'
 			pie_sel = ui.getData('pie_selection')
 			pie_parts = ui.getData('pie_parts')
 			pie_filenames = ui.getData('pie_filenames')
-			pies = dict()
-			for i, name in enumerate(pie_filenames):
-				if not pie_errors[i] and pie_sel[i].val:
-					pies[name.val] = pie_parts[i]
+			pies = {
+				name.val: pie_parts[i]
+				for i, name in enumerate(pie_filenames)
+				if not pie_errors[i] and pie_sel[i].val
+			}
+
 			ui.setData('pies', pies, True)
 			dir = ui.getData('export-dir').val
 			ui.setData('export-dir', dir, True)
 			return True
 		elif val == 1:
 			return False
-		elif 3 == val:
+		elif val == 3:
 			setdir = lambda path: ui.setData('export-dir', Draw.Create(path))
 			Window.FileSelector(setdir, 'Select export path', '')
 			Draw.Redraw()
 		return
 	pie_names = ui.getData('pie_names')
 	if pie_errors[val]:
-		Draw.PupMenu("Errors in " + pie_names[val] + " %t|" + \
-			'|'.join(["%s: %s" % err for err in pie_errors[val]]))
+		Draw.PupMenu(
+			(
+				f"Errors in {pie_names[val]} %t|"
+				+ '|'.join(["%s: %s" % err for err in pie_errors[val]])
+			)
+		)
+
 		return
 	if not ui.getData('pie_filenames')[val].val:
 		ui.getData('pie_selection')[val].val = 0
@@ -240,8 +263,7 @@ def pie_sel_evt(ui, val):
 
 def opts_draw(ui):
 	precision = ui.getData('precision', Draw.Create(0))
-	if precision.val > 0: pie_version = 5
-	else: pie_version = 2
+	pie_version = 5 if precision.val > 0 else 2
 	Blender.Draw.Label("Version: PIE %i" % pie_version, 10, 80, 130, 30)
 	precision = Blender.Draw.Number("precision", 2, 10, 50, 130, 30,
 		precision.val, 0, 5)
@@ -250,12 +272,12 @@ def opts_draw(ui):
 	ui.setData('precision', precision)
 
 def opts_evt(ui, val):
-	if 0 == val:
+	if val == 0:
 		precision = ui.getData('precision').val
 		ui.debug("starting export at floating-point precision of %i" % precision)
 		ui.setData('precision', precision, True)
 		return True
-	elif 1 == val:
+	elif val == 1:
 		return False
 	else:
 		Draw.Redraw()
@@ -264,7 +286,7 @@ def export_process(ui):
 	dir = ui.getData('export-dir')
 	for name, parts in ui.getData('pies').iteritems():
 		name = os.path.join(dir, name)
-		ui.debug('exporting to ' + name)
+		ui.debug(f'exporting to {name}')
 		fs_callback(ui, name, *parts)
 
 ui = BeltFedUI(True)

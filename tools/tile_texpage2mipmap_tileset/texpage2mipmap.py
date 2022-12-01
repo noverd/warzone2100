@@ -60,7 +60,7 @@ import os, sys, shutil
 from subprocess import Popen, PIPE
 
 def ds_ppm_parser(file):
-	tokens = list()
+	tokens = []
 	gen = iter(file)
 	for line in gen:
 		comment = line.find('#')
@@ -85,11 +85,10 @@ def ds_ppm_parser(file):
 			except StopIteration:
 				break
 	elif magicnum == "p6":
-		if len(tokens) < 1:
+		if not tokens:
 			tokens = list(gen)
-		if maxval < 256: chunksize = 1
-		else: chunksize = 2
-		raster, tokens = ''.join(tokens), list()
+		chunksize = 1 if maxval < 256 else 2
+		raster, tokens = ''.join(tokens), []
 		for i in xrange(0, len(raster), chunksize):
 			num = ord(raster[i])
 			if chunksize > 1: num = (num << 8) + ord(raster[i + 1])
@@ -180,7 +179,7 @@ def nearest_resolution(initial_index, arr):
 
 	for i in range(initial_index + 1, len(arr)):
 		if arr[i]: return (i, True)
-	seq = range(0, initial_index)
+	seq = range(initial_index)
 	seq.reverse()
 	for i in seq:
 		if arr[i]: return (i, False)

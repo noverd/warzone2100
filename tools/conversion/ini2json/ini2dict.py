@@ -25,4 +25,3 @@ for n in range(1, len(sys.argv)):
 		if section in data:
 			print >> sys.stderr, "Error: %s is duplicate in %s" % (section, sys.argv[n])
 		data[section] = name
-print json.dumps(data, indent=4, separators=(',', ': '))
